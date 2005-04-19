@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: File-Rename
+version: 0.01
+author:
+  - Robin Barker <RMBarker@cpan.org>
+abstract: Perl extension for renaming multiple files
+license: perl
+provides:
+  File::Rename:
+    file: lib/File/Rename.pm
+    version: 0.01
+generated_by: Module::Build version 0.2608
