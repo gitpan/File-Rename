@@ -7,7 +7,7 @@ use warnings;
 use base qw(Exporter);
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub rename_files ($$@) {
     my $code = shift;
@@ -62,7 +62,22 @@ File::Rename - Perl extension for renaming multiple files
 
 =head1 DESCRIPTION
 
-File::Rename::rename FILES, CODE, [VERBOSE] 
+=over 4
+
+=item C<rename( FILES, CODE [, VERBOSE])>
+
+rename FILES using CODE,
+if FILES is empty read list of files from stdin
+
+=item C<rename_files( CODE, VERBOSE, FILES)>
+
+rename FILES using CODE
+
+=item C<rename_list( CODE, VERBOSE, HANDLE [, FILENAME])>
+
+rename a list of file read from HANDLE, using CODE
+
+=back
 
 =head2 OPTIONS
 
@@ -70,15 +85,27 @@ File::Rename::rename FILES, CODE, [VERBOSE]
 
 =item FILES
 
-(Reference to) list of files to be renamed
+List of files to be renamed,
+for C<rename> must be an array
 
 =item CODE
 
-Subroutine to change file names, or code as string
+Subroutine to change file names,
+for C<rename> can be a string,
+otherside a code reference
 
 =item VERBOSE
 
-Flag for printing names of files successfully renamed
+Flag for printing names of files successfully renamed,
+optional for C<rename>
+
+=item HANDLE
+
+Filehandle to read file names to be renames
+
+=item FILENAME (Optional)
+
+Name of file that HANDLE reads from
 
 =back
 
@@ -104,7 +131,7 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 by Robin Barker
+Copyright (C) 2004, 2005, 2006 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
