@@ -1,4 +1,4 @@
-File-Rename version 0.02
+File-Rename version 0.03
 ========================
 
 File::Rename provides an implementation of Larry Wall's eg/rename command.
@@ -37,9 +37,7 @@ File::Basename File::Path File::Spec File::Temp Getopt::Long
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
-
-Copyright (C) 2005, 2006 by Robin Barker
+Copyright (C) 2005, 2006, 2007 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

@@ -5,7 +5,8 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 8;
+use Test::More tests => 11;
+
 BEGIN { use_ok('File::Rename') };
 
 #########################
@@ -27,6 +28,11 @@ mkdir $subdir or die;
 my $sub_test = File::Spec->catfile($subdir,'test.txt');
 
 for my $file ($test_foo, $copy_foo, $copy_bar, $new1, $old2, $sub_test) {
+    create_file($file)
+}
+
+sub create_file {
+    my($file) = @_;
     local *FILE; 
     open FILE, '>', $file or die "Can't create $file: $!\n";
     print FILE "This is $file\n" or die;
@@ -58,12 +64,24 @@ sub test_rename {
 
     undef $found;
     if( $warning ) {
-	if( $warn =~ s/^\Q$warning\E\b.*\n//sm ) { $found ++ }
-    	else { $warn = "(no warning)\n" unless $warn }
+	if( $warn ) {
+	    if( $warn =~ s/^\Q$warning\E\b.*\n//sm ) { $found ++ }
+	}
+    	else { $warn = "(no warning)\n" }
+	     
+	unless( $found ) {
+	    $warning =~ s/^/EXPECT: WARN: /mg; diag $warning;
+	}
     }
     elsif( $printed ) {
-	if( $print =~ s/^\Q$printed\E\b.*\n//sm ) { $found ++ }
-    	else { $print = "(no output)\n" unless $print }
+	if( $print ) {
+	    if( $print =~ s/^\Q$printed\E(\s.*)?\n//sm ) { $found ++ }
+	}
+    	else { $print = "(no output)\n" }
+	     
+	unless( $found ) {
+	    $printed =~ s/^/EXPECT: PRINT: /mg; diag $printed;
+	}
     }
     else {
 	$found++ unless $warn or $print;
@@ -89,11 +107,25 @@ test_rename($s, $copy_foo, undef, "$copy_foo not renamed");
 ok( (-e $copy_foo and $found), "rename: file exists"); 
 diag_rename;
 
+test_rename($s, $copy_foo, {over_write=>1});
+ok( (!-e $copy_foo and $found), "rename: over_write"); 
+diag_rename;
+
+create_file($copy_foo);
+test_rename($s, $copy_foo, {over_write=>1, verbose=>1},
+ 		undef, "$copy_foo renamed as $copy_bar");
+ok( (!-e $copy_foo and $found), "rename: over_write+verbose"); 
+diag_rename;
+
 test_rename($s, $sub_test, undef, "Can't rename $sub_test");
 ok( (-e $sub_test and $found), "rename: can't rename"); 
 diag_rename;
 
 my $inc = sub { s/(\d+)/ $1 + 1 /e unless /\.old\z/ };
+
+test_rename($inc, $new1, {no_action=>1}, undef, "rename($new1, $new2)");
+ok( (-e $new1 and !-e $new2 and $found), "rename: no_action");
+diag_rename;
 
 test_rename($inc, $new1, 1, undef, "$new1 renamed as $new2");
 ok( (-e $new2 and !-e $new1 and $found), "rename 1->2");

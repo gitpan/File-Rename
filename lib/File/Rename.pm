@@ -2,46 +2,141 @@ package File::Rename;
 
 use 5.006;
 use 5.8.0;
+
+package File::Rename::Options;
+
+use strict;
+use warnings;
+use Getopt::Long ();
+Getopt::Long::Configure qw(posix_default);
+
+sub GetOptions () {
+    Getopt::Long::GetOptions(
+	'-v|verbose'	=> \my $verbose,
+	'-n|nono'	=> \my $nono,
+	'-f|force'	=> \my $force,
+	'-h|?|help'	=> \my $help,
+	'-m|man'	=> \my $man,
+	'-e=s'		=> \my @expression
+    ) or return;
+
+    my $options = {
+	verbose 	=> $verbose,
+	no_action	=> $nono,
+	over_write	=> $force,
+	show_help	=> $help,
+	show_manual	=> $man,
+    };
+    return $options if $help or $man;
+	 
+    if( @expression ) {
+	$options->{_code} = join "\n", @expression;
+    }
+    else { 
+	return unless @ARGV;
+	$options->{_code} = shift @ARGV;
+    } 
+    return $options;
+}
+ 
+sub ProcessOptions (\@) {
+    my $argv = shift;
+    local @ARGV = @$argv;
+    my $options = GetOptions;
+    @$argv = @ARGV;
+    return $options;
+}
+
+package File::Rename;
+
 use strict;
 use warnings;
 use base qw(Exporter);
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+sub _default(\$);
 
 sub rename_files ($$@) {
     my $code = shift;
-    my $verbose = shift;
+    my $options = shift;
+    _default $options; 
     for (@_) {
         my $was = $_;
-	&$code;
+	$code->();
     	if( $was eq $_ ){ }		# ignore quietly
-    	elsif( -e $_ )	{ 
+    	elsif( -e $_ and not $options->{over_write} ) { 
 		warn  "$was not renamed: $_ already exists\n"; 
 	}
+    	elsif( $options->{no_action} ) { 
+		print "rename($was, $_)\n";
+	}
     	elsif( CORE::rename($was,$_)) { 
-		print "$was renamed as $_\n" if $verbose; 
+		print "$was renamed as $_\n" if $options->{verbose}; 
 	}
     	else { 	warn  "Can't rename $was $_: $!\n"; }
     }
 }
 
 sub rename_list ($$$;$) {
-    my($code, $verbose, $fh, $file) = @_;
+    my($code, $options, $fh, $file) = @_;
+    _default $options; 
     print "reading filenames from ",
 	(defined $file ? $file : 'file handle ($fh)'),
-	"\n" if $verbose;
+	"\n" if $options->{verbose};
     chop(my @file = <$fh>); 
-    rename_files $code, $verbose,  @file;
+    rename_files $code, $options,  @file;
 }
 
 sub rename (\@$;$) {
     my($argv, $code, $verbose) = @_;
+    if( ref $code ) {
+	if( 'HASH' eq ref $code ) {
+	    require Carp;
+	    if(defined $verbose ) {
+ 		Carp::carp(<<CARP);
+File::Rename::rename: third argument ($verbose) ignored
+CARP
+	    } 
+	    $verbose = $code;
+	    $code = delete $verbose->{_code}
+	  	or Carp::carp(<<CARP);
+File::Rename::rename: no _code in $verbose
+CARP
+
+	}	
+    } 
     unless( ref $code ) {
-	$code = eval 'sub { '. $code .' }' or die $@;
+	if( my $eval = eval <<CODE ) 
+sub {
+#line 1
+$code
+#line
+}
+CODE
+	{	
+	    $code = $eval;
+	} 
+	else {
+	    my $error = $@;
+	    $error =~ s/\(eval\s+\d+\)/\(user-supplied code\)/g;
+	    $error =~ s/\s+line\s+1\b//g unless $code =~ /\n/;
+	    $error =~ s/\"[^#"]*\#line\s+1\n/"/;
+	    $error =~ s/\n\#line\n[^#"]*\"/"/;
+	    $error =~ s/\s*\z/\n/;
+	    die $error;
+	}
     }
     if( @$argv ) { rename_files $code, $verbose, @$argv }
     else { rename_list $code, $verbose, \*STDIN, 'STDIN' }
+}
+
+sub _default (\$) {
+    my $ref = shift;
+    return if ref $$ref;
+    my $verbose = $$ref;
+    $$ref = { verbose => $verbose }
 }
 
 1;
@@ -109,6 +204,40 @@ Name of file that HANDLE reads from
 
 =back
 
+=head2 HASH
+
+Either CODE or VERBOSE can be a HASH of options.
+
+If CODE is a HASH, VERBOSE is ignored 
+and CODE is supplied by the B<_code> key.
+
+Other options are 
+
+=over 16
+
+=item B<verbose>
+
+As VERBOSE above, provided by B<-v>.
+
+=item B<no_action>
+
+Print names of files to be renamed, but do not rename
+(i.e. take no action), provided by B<-n>.
+
+=item B<over_write>
+
+Allow files to be over-written by the renaming, provided by B<-f>. 
+
+=item B<show_help>
+
+Print help, provided by B<-h>.
+
+=item B<show_manual> 
+
+Print manual page, provide by B<-m>.
+
+=back
+
 =head2 EXPORT
 
 None by default.
@@ -119,11 +248,18 @@ No environment variables are used.
 
 =head1 SEE ALSO
 
-mv(1), perl(1), rename (1)
+mv(1), perl(1), rename(1)
 
 =head1 AUTHOR
 
 Robin Barker <RMBarker@cpan.org>
+
+=head1 Acknowledgements
+
+Based on code from Larry Wall.
+
+Options B<-e>, B<-f>, B<-n> suggested
+by more recent code written by Aristotle Pagaltzis.
 
 =head1 DIAGNOSTICS
 
@@ -138,3 +274,4 @@ it under the same terms as Perl itself, either Perl version 5.8.4 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
+

@@ -10,15 +10,13 @@ print OUT "#!perl -w\n";
 print OUT while <DATA>;
 exit;
 __END__
-# Larry(?)'s RCS header:
+# $Revision: 128 $$Date: 2007-09-19 09:49:26 +0100 (Wed, 19 Sep 2007) $
+# Robin's RCS header:
+# RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
+# Larry's RCS header:
 #  RCSfile: rename,v   Revision: 4.1   Date: 92/08/07 17:20:30 
 #
-# $RCSfile: rename.PL,v $$Revision: 1.1 $$Date: 2005/04/14 13:19:22 $
-#
-# $Log: rename.PL,v $
-# Revision 1.1  2005/04/14 13:19:22  rmb1
-# Initial revision
-#
+#  Log: rename,v 
 # Revision 1.5  1998/12/18 16:16:31  rmb1
 # moved to perl/source
 # changed man documentation to POD
@@ -38,20 +36,19 @@ __END__
 
 use strict;
 use File::Rename ();
-use Getopt::Long;
-$Getopt::Long::ignorecase = 0;
+use Pod::Usage;
 
-my $bad_args;
-GetOptions('-v' => \my $verbose)	or $bad_args = 1;
-my $op = shift				or $bad_args = 1; 
+my $options = File::Rename::Options::GetOptions
+    or pod2usage;
 
-die "Usage: rename [-v] perlexpr [filenames]\n"	if $bad_args;
+pod2usage( -verbose => 2 ) if $options->{show_manual};
+pod2usage( -exitval => 1 ) if $options->{show_help};
 
 @ARGV = map glob, @ARGV if $^O =~ /Win/;
-File::Rename::rename @ARGV, $op, $verbose;
+
+File::Rename::rename @ARGV, $options;
 
 __END__
-
 
 =head1 NAME
 
@@ -59,7 +56,13 @@ rename - renames multiple files
 
 =head1 SYNOPSIS
 
-B<rename> S<[ B<-v> ]> I<perlexpr> S<[ I<files> ]>
+B<rename>
+S<[ B<-h>|B<-m> ]>
+S<[ B<-v> ]>
+S<[ B<-n> ]>
+S<[ B<-f> ]>
+S<[ B<-e> I<perlexpr>]*|I<perlexpr>>
+S<[ I<files> ]>
 
 =head1 DESCRIPTION
 
@@ -87,9 +90,32 @@ To translate uppercase names to lower, you'd use
 
 =over 8
 
-=item B<-v>
+=item B<-v>, B<-verbose>
 
 Verbose: print names of files successfully renamed.
+
+=item B<-n>, B<-nono>
+
+No action: print names of files to be renamed, but don't rename.
+
+=item B<-f>, B<-force>
+
+Over write: allow existing files to be over-written.
+
+=item B<-h>, B<-help>
+
+Help: print SYNOPSIS and OPTIONS.
+
+=item B<-m>, B<-man>
+
+Manual: print manual page.
+
+=item B<-e>
+
+Expression: code to act on files name.
+
+May be repeated to build up code (like C<perl -e>).
+If no B<-e>, the first argument is used as code.
 
 =back
 
