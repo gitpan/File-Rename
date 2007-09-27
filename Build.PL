@@ -11,6 +11,16 @@ Module::Build -> new (
 	module_name	=> 'File::Rename',
 	PL_files	=> { 'rename.PL' => $script },
 	#   create_makefile_pl	=> 'traditional'
-	
+	requires	=> { 'Getopt::Long' => 0 },
+	build_requires	=> {
+		'File::Temp'	=> 0,
+		'Test::More'	=> 0,
+	 },
+	recommends	=> {
+		'Getopt::Long'	=> 2.24, # for Configure qw(posix_default);
+		'Test::Pod' 	=> 0,
+		'File::Spec'	=> 0.82, # required for Pod::Parser, for ...
+		'Test::Pod::Coverage' => 0,
+	}
 ) -> create_build_script;
-	 
+

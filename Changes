@@ -1,5 +1,9 @@
 Revision history for Perl extension File::Rename.
 
+0.04	Robin Barker 2007-09-27
+	Replaced depencies on perl versions by explicit
+	requirements on modules in Build.PL/Makefile.PL
+
 0.03	Robin Barker 2007-09-26
 	Added --force and --nono options (over_write, no_action)
 

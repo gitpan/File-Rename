@@ -1,14 +1,11 @@
 package File::Rename;
 
-use 5.006;
-use 5.8.0;
-
 package File::Rename::Options;
 
 use strict;
 use warnings;
 use Getopt::Long ();
-Getopt::Long::Configure qw(posix_default);
+eval{ Getopt::Long::Configure qw(posix_default); 1 } or warn $@;
 
 sub GetOptions () {
     Getopt::Long::GetOptions(
@@ -54,7 +51,7 @@ use warnings;
 use base qw(Exporter);
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub _default(\$);
 
