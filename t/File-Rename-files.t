@@ -24,7 +24,7 @@ my($test_foo, $test_bar, $copy_foo, $copy_bar, $new1, $new2, $old2, $old3) =
 	qw(test.foo test.bar copy.foo copy.bar 1.new 2.new 2.old 3.old);
 
 my $subdir = 'food';
-mkdir $subdir or die;
+File::Path::mkpath $subdir or die;
 my $sub_test = File::Spec->catfile($subdir,'test.txt');
 
 for my $file ($test_foo, $copy_foo, $copy_bar, $new1, $old2, $sub_test) {
@@ -34,9 +34,9 @@ for my $file ($test_foo, $copy_foo, $copy_bar, $new1, $old2, $sub_test) {
 sub create_file {
     my($file) = @_;
     local *FILE; 
-    open FILE, '>', $file or die "Can't create $file: $!\n";
-    print FILE "This is $file\n" or die;
-    close FILE or die;
+    open  FILE, '>'. $file or die "Can't create $file: $!\n";
+    print FILE "This is $file\n" or die $!;
+    close FILE or die $!;
 } 
 
 my $warn;
@@ -49,14 +49,14 @@ sub test_rename {
   my($sub, $file, $verbose, $warning, $printed) = @_;
 
   { local *STDOUT;
-    open STDOUT, '>', 'log' or die "Can't create log file: $!\n";
+    open STDOUT, '>'. 'log' or die "Can't create log file: $!\n";
     undef $warn;
     File::Rename::rename_files($sub, $verbose, $file);
     close STDOUT or die;
   }
 
   { local *READ; 
-    open READ, 'log' or die "Can't read log file: $!\n";
+    open READ, '<'. 'log' or die "Can't read log file: $!\n";
     local $/;
     $print = <READ>; 
     close READ or die;

@@ -1,4 +1,4 @@
-File-Rename version 0.04
+File-Rename version 0.05
 ========================
 
 File::Rename provides an implementation of Larry Wall's eg/rename command.
@@ -31,9 +31,12 @@ or if you have Module::Build
 DEPENDENCIES
 
 This module requires these other modules and libraries:
-File::Basename File::Path File::Spec File::Temp Getopt::Long
+File::Basename File::Path File::Spec Getopt::Long
 (all included with Perl). 
 
+Testing requires File::Temp and Test::More which are
+available with perl 5.6.0.  I have successfully installed
+those modules for perl 5.005_05 and tested this module.
 
 COPYRIGHT AND LICENCE
 

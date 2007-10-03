@@ -1,5 +1,9 @@
 Revision history for Perl extension File::Rename.
 
+0.05	Robin Barker 2007-10-03
+	Removed perl 5.6.0 dependencies and successfully
+	tested on perl 5.005_05 (with patched Temp::File).
+
 0.04	Robin Barker 2007-09-27
 	Replaced depencies on perl versions by explicit
 	requirements on modules in Build.PL/Makefile.PL

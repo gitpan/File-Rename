@@ -1,6 +1,6 @@
 ---
 name: File-Rename
-version: 0.04
+version: 0.05
 author:
   - 'Robin Barker <RMBarker@cpan.org>'
 abstract: Perl extension for renaming multiple files
@@ -20,7 +20,7 @@ recommends:
 provides:
   File::Rename:
     file: lib/File/Rename.pm
-    version: 0.04
+    version: 0.05
   File::Rename::Options:
     file: lib/File/Rename.pm
 generated_by: Module::Build version 0.280801

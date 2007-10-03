@@ -22,8 +22,10 @@ File::Path::mkpath $dir;
 
 sub create (@) {
     for (@_) { 
-        open my $fh, '>',  File::Spec->catfile($dir, $_) or die $!; 
-        close $fh or die $!;
+	local *FILE;
+        open  FILE, '>'. File::Spec->catfile($dir, $_) or die $!; 
+	print FILE "This is @_\n";
+        close FILE or die $!;
     } 
 }
 

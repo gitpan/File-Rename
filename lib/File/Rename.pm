@@ -1,9 +1,10 @@
 package File::Rename;
 
+use strict;
+BEGIN { eval { require warnings; warnings->import } }
+
 package File::Rename::Options;
 
-use strict;
-use warnings;
 use Getopt::Long ();
 eval{ Getopt::Long::Configure qw(posix_default); 1 } or warn $@;
 
@@ -46,12 +47,11 @@ sub ProcessOptions (\@) {
 
 package File::Rename;
 
-use strict;
-use warnings;
 use base qw(Exporter);
+use vars qw(@EXPORT_OK $VERSION);
 
-our @EXPORT_OK = qw( rename );
-our $VERSION = '0.04';
+@EXPORT_OK = qw( rename );
+$VERSION = '0.05';
 
 sub _default(\$);
 

@@ -4,13 +4,13 @@ use File::Path qw(mkpath);
 
 my $file = shift;
 unless( -d( my $dir = dirname $file ) ) { mkpath $dir, 1 }
-open OUT, '>', $file or die "$0 can't open $file: $!\n";
+open OUT, '>'. $file or die "$0 can't open $file: $!\n";
 
 print OUT "#!perl -w\n";
 print OUT while <DATA>;
 exit;
 __END__
-# $Revision: 128 $$Date: 2007-09-19 09:49:26 +0100 (Wed, 19 Sep 2007) $
+# $Revision: 157 $$Date: 2007-10-03 17:21:03 +0100 (Wed, 03 Oct 2007) $
 # Robin's RCS header:
 # RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
 # Larry's RCS header:
