@@ -6,8 +6,11 @@ MANIFEST.SKIP
 README
 t/File-Rename.t
 t/File-Rename-files.t
+t/File-Rename-list.t
 t/pod.t
 t/pod-coverage.t
 lib/File/Rename.pm
 rename.PL
+examples/rename.pl
+META.json		Module meta-data (added by Module::Build)
 META.yml		Module meta-data (added by MakeMaker)

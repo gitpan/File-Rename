@@ -51,7 +51,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 sub _default(\$);
 
@@ -79,8 +79,12 @@ sub rename_files ($$@) {
 sub rename_list ($$$;$) {
     my($code, $options, $fh, $file) = @_;
     _default $options; 
-    print "reading filenames from ",
-	(defined $file ? $file : 'file handle ($fh)'),
+    print "Reading filenames from ",
+	( defined $file ?		$file 
+	: defined *{$fh}{SCALAR} and
+	  defined ${*{$fh}{SCALAR}} ?	${*{$fh}{SCALAR}}
+	:	 			"file handle ($fh)"
+	),
 	"\n" if $options->{verbose};
     chop(my @file = <$fh>); 
     rename_files $code, $options,  @file;
@@ -264,7 +268,7 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, 2005, 2006 by Robin Barker
+Copyright (C) 2004, 2005, 2006, 2011 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
