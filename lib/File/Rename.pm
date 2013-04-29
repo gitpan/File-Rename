@@ -6,15 +6,20 @@ BEGIN { eval { require warnings; warnings->import } }
 package File::Rename::Options;
 
 use Getopt::Long ();
-eval{ Getopt::Long::Configure qw(posix_default); 1 } or warn $@;
 
-sub GetOptions () {
+eval{ Getopt::Long::Configure qw(
+	posix_default
+	no_ignore_case
+); 1 } or warn $@;
+
+sub GetOptions {
     Getopt::Long::GetOptions(
 	'-v|verbose'	=> \my $verbose,
 	'-n|nono'	=> \my $nono,
 	'-f|force'	=> \my $force,
 	'-h|?|help'	=> \my $help,
 	'-m|man'	=> \my $man,
+	'-V|version'	=> \my $version,
 	'-e=s'		=> \my @expression
     ) or return;
 
@@ -24,8 +29,9 @@ sub GetOptions () {
 	over_write	=> $force,
 	show_help	=> $help,
 	show_manual	=> $man,
+	show_version	=> $version,
     };
-    return $options if $help or $man;
+    return $options if $help or $man or $version;
 	 
     if( @expression ) {
 	$options->{_code} = join "\n", @expression;
@@ -37,28 +43,18 @@ sub GetOptions () {
     return $options;
 }
  
-sub ProcessOptions (\@) {
-    my $argv = shift;
-    local @ARGV = @$argv;
-    my $options = GetOptions;
-    @$argv = @ARGV;
-    return $options;
-}
-
 package File::Rename;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.06';
+$VERSION = '0.10';
 
-sub _default(\$);
-
-sub rename_files ($$@) {
+sub rename_files {
     my $code = shift;
     my $options = shift;
-    _default $options; 
+    _default(\$options); 
     for (@_) {
         my $was = $_;
 	$code->();
@@ -76,9 +72,9 @@ sub rename_files ($$@) {
     }
 }
 
-sub rename_list ($$$;$) {
+sub rename_list { 
     my($code, $options, $fh, $file) = @_;
-    _default $options; 
+    _default(\$options); 
     print "Reading filenames from ",
 	( defined $file ?		$file 
 	: defined *{$fh}{SCALAR} and
@@ -90,19 +86,19 @@ sub rename_list ($$$;$) {
     rename_files $code, $options,  @file;
 }
 
-sub rename (\@$;$) {
+sub rename { 
     my($argv, $code, $verbose) = @_;
     if( ref $code ) {
 	if( 'HASH' eq ref $code ) {
 	    require Carp;
 	    if(defined $verbose ) {
- 		Carp::carp(<<CARP);
+		Carp::carp(<<CARP);
 File::Rename::rename: third argument ($verbose) ignored
 CARP
 	    } 
 	    $verbose = $code;
 	    $code = delete $verbose->{_code}
-	  	or Carp::carp(<<CARP);
+	    	or Carp::carp(<<CARP);
 File::Rename::rename: no _code in $verbose
 CARP
 
@@ -133,7 +129,7 @@ CODE
     else { rename_list $code, $verbose, \*STDIN, 'STDIN' }
 }
 
-sub _default (\$) {
+sub _default {
     my $ref = shift;
     return if ref $$ref;
     my $verbose = $$ref;
@@ -235,7 +231,11 @@ Print help, provided by B<-h>.
 
 =item B<show_manual> 
 
-Print manual page, provide by B<-m>.
+Print manual page, provided by B<-m>.
+
+=item B<show_version> 
+
+Print version number, provided by B<-V>.
 
 =back
 

@@ -2,4 +2,6 @@
 /RCS/
 \.SKIP$
 \.tar\.gz$
+^\.svn/
+/\.svn/
 ~$

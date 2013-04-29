@@ -6,6 +6,7 @@ MANIFEST.SKIP
 README
 t/File-Rename.t
 t/File-Rename-files.t
+t/File-Rename-script.t
 t/File-Rename-list.t
 t/pod.t
 t/pod-coverage.t

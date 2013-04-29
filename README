@@ -1,16 +1,24 @@
-File-Rename version 0.06
+File-Rename version 0.10
 ========================
 
-File::Rename provides an implementation of Larry Wall's eg/rename command.
-All I have done is added some error checking and (more recently) added the
-File/Rename.pm module.  An earlier version of the script is out in the
-Internet and is included with some linuxes, and the original eg/rename is
-not included in the Perl distribution, so I have put this up on CPAN.
+File::Rename provides an implementation of Larry Wall's eg/rename
+command.  All I have done is add some error checking and (more recently)
+add the File/Rename.pm module.
 
-For Windows, the script is called file-rename to avoid clashes with existing
-rename command.
- 
- 
+An earlier version of the script is out in the Internet and is included
+with some linuxes, and the original eg/rename is not included in the
+Perl distribution, so I have put this up on CPAN.
+
+A revised version of the earlier script is now on the Internet,
+which includes more options.  This script, distinguished by
+"Getopt::Long::Configure('bundling')", was not written by me; I think
+the author is Aristotle Pagaltzis.  Version 0.10 of this distribution
+has similar options to the revised script.
+
+For Windows, the script is called file-rename to avoid clashes with
+existing rename command.
+
+
 INSTALLATION
 
 To install this module type the following:

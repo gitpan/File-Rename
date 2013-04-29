@@ -15,6 +15,7 @@ Module::Build -> new (
 		'Getopt::Long'	=> 0,
 		perl 		=> 5,
 	},
+	configure_requires => { 'Module::Build' => 0.40 },
 	build_requires	=> {
 		'File::Temp'	=> 0,
 		'Test::More'	=> 0,

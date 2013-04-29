@@ -4,7 +4,7 @@
       "Robin Barker <RMBarker@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "File::Rename" : {
          "file" : "lib/File/Rename.pm",
-         "version" : "0.06"
+         "version" : "0.10"
       },
       "File::Rename::Options" : {
          "file" : "lib/File/Rename.pm",
@@ -54,5 +54,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06"
+   "version" : "0.10"
 }

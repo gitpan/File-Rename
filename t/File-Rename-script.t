@@ -1,12 +1,19 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl File-Rename.t'
+# `make test'. After `make install' it should work as
+# `perl -I/usr/local/bin t/File-Rename-script.t'
 
 #########################
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 3;
-BEGIN { use_ok('File::Rename') };
+BEGIN { push @INC, qw(blib/script) if -d 'blib' };
+
+my $script = ($^O =~ m{Win} ? 'file-rename' : 'rename');
+my $require_ok =  eval { require($script) };
+ok( $require_ok, 'require script - '. $script);
+die $@ unless $require_ok;
+diag "required ".$INC{$script};
 
 #########################
 
@@ -22,18 +29,18 @@ File::Path::mkpath $dir;
 
 sub create (@) {
     for (@_) { 
-	local *FILE;
-        open  FILE, '>'. File::Spec->catfile($dir, $_) or die $!; 
-	print FILE "This is @_\n";
-        close FILE or die $!;
+        open my $fh, '>',  File::Spec->catfile($dir, $_) or die $!; 
+        close $fh or die $!;
     } 
 }
 
 create qw(bing.txt bong.txt);
 
+sub main_argv { local @ARGV = @_; main () } 
+
 # test 2
 
-File::Rename::rename( [ glob File::Spec->catfile($dir,'b*') ], 's/i/a/' );
+main_argv( 's/i/a/', glob File::Spec->catfile($dir,'b*') ); 
 opendir DIR, $dir or die $!;
 is_deeply( [ sort grep !/^\./, readdir DIR ], 
 		[qw(bang.txt bong.txt)], 'rename - files' );
@@ -48,7 +55,7 @@ die unless defined $pid;
 
 unless( $pid ) {	# CHILD
     close WRITE;
-    File::Rename::rename( [], 'substr $_, -7, 2, "u"' );
+    main_argv( 'substr $_, -7, 2, "u"' );
     # diag "Child: $$";
 # Test::Builder 0.15 does _ending in children
     Test::Builder->new->no_ending(1) unless

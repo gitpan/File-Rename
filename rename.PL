@@ -8,9 +8,10 @@ open OUT, '>'. $file or die "$0 can't open $file: $!\n";
 
 print OUT "#!perl -w\n";
 print OUT while <DATA>;
+close OUT or die $!;
 exit;
 __END__
-# $Revision: 157 $$Date: 2007-10-03 17:21:03 +0100 (Wed, 03 Oct 2007) $
+# $Revision: 325 $$Date: 2013-04-29 23:17:25 +0100 (Mon, 29 Apr 2013) $
 # Robin's RCS header:
 # RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
 # Larry's RCS header:
@@ -38,15 +39,27 @@ use strict;
 use File::Rename ();
 use Pod::Usage;
 
-my $options = File::Rename::Options::GetOptions
-    or pod2usage;
+main() unless caller;
 
-pod2usage( -verbose => 2 ) if $options->{show_manual};
-pod2usage( -exitval => 1 ) if $options->{show_help};
+sub main {
+    my $options = File::Rename::Options::GetOptions
+        or pod2usage;
 
-@ARGV = map glob, @ARGV if $^O =~ /Win/;
+    if( $options->{show_version} ) {
+        print $0 .' using File::Rename version '.
+	            $File::Rename::VERSION ."\n\n";
+        exit 0;
+    }
 
-File::Rename::rename @ARGV, $options;
+    pod2usage( -verbose => 2 ) if $options->{show_manual};
+    pod2usage( -exitval => 1 ) if $options->{show_help};
+
+    @ARGV = map {glob} @ARGV if $^O =~ m{Win}msx;
+
+    File::Rename::rename(\@ARGV, $options);
+}
+
+1;
 
 __END__
 
@@ -57,7 +70,7 @@ rename - renames multiple files
 =head1 SYNOPSIS
 
 B<rename>
-S<[ B<-h>|B<-m> ]>
+S<[ B<-h>|B<-m>|B<-V> ]>
 S<[ B<-v> ]>
 S<[ B<-n> ]>
 S<[ B<-f> ]>
@@ -109,6 +122,10 @@ Help: print SYNOPSIS and OPTIONS.
 =item B<-m>, B<-man>
 
 Manual: print manual page.
+
+=item B<-V>, B<-version>
+
+Version: show version number.
 
 =item B<-e>
 
