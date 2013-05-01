@@ -6,14 +6,13 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 4;
+use Test::More tests => 2;
 BEGIN { push @INC, qw(blib/script) if -d 'blib' };
 
 my $script = ($^O =~ m{Win} ? 'file-rename' : 'rename');
 my $require_ok =  eval { require($script) };
 ok( $require_ok, 'require script - '. $script);
 die $@ unless $require_ok;
-like( $INC{$script}, qr{/ $script \z}msx, "required $script in \%INC");
 
 #########################
 
@@ -40,41 +39,11 @@ sub main_argv { local @ARGV = @_; main () }
 
 # test 2
 
-main_argv( 's/i/a/', glob File::Spec->catfile($dir,'b*') ); 
+main_argv('-E', 's/i/a/', '-E', 's/g/j/',
+	glob File::Spec->catfile($dir,'b*') ); 
 opendir DIR, $dir or die $!;
 is_deeply( [ sort grep !/^\./, readdir DIR ], 
-		[qw(bang.txt bong.txt)], 'rename - files' );
+		[qw(banj.txt bonj.txt)], 'rename - files' );
 closedir DIR or die $!; 
 
-# test 3
-
-close STDIN or die;
-pipe(STDIN, WRITE) or die;
-my $pid = fork;
-die unless defined $pid;
-
-unless( $pid ) {	# CHILD
-    close WRITE;
-    main_argv( 'substr $_, -7, 2, "u"' );
-    # diag "Child: $$";
-# Test::Builder 0.15 does _ending in children
-    Test::Builder->new->no_ending(1) unless
-        $Test::Builder::VERSION > 0.15;
-    exit; 
-}
-
-close STDIN; 
-print WRITE File::Spec->catfile($dir,'bong.txt');
-print WRITE "\n"; 
-close WRITE or die $!;
-# diag "Parent: $$";
-wait;
-
-# diag "Waited: $pid";
-opendir DIR, $dir or die $!;
-is_deeply( [ sort grep !/^\./, readdir DIR ], 
-		[qw(bang.txt bug.txt)], 'rename - list' );
-closedir DIR or die $!; 
-
-File::Path::rmtree $dir; 
-
+File::Path::rmtree $dir;

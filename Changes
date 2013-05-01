@@ -1,5 +1,8 @@
 Revision history for Perl extension File::Rename.
 
+0.20	Robin Barker 2013-04-30
+	Added option -E (statement): alternative to -e
+
 0.10	Robin Barker 2013-04-29
 	Merged "0.09 (beta for 0.10)" from 2006-06-26
 	Added option -V (version). 

@@ -11,7 +11,7 @@ print OUT while <DATA>;
 close OUT or die $!;
 exit;
 __END__
-# $Revision: 325 $$Date: 2013-04-29 23:17:25 +0100 (Mon, 29 Apr 2013) $
+# $Revision: 331 $$Date: 2013-04-30 21:23:41 +0100 (Tue, 30 Apr 2013) $
 # Robin's RCS header:
 # RCSfile: rename.PL,v Revision: 1.3   Date: 2006/05/25 09:20:32 
 # Larry's RCS header:
@@ -45,12 +45,7 @@ sub main {
     my $options = File::Rename::Options::GetOptions
         or pod2usage;
 
-    if( $options->{show_version} ) {
-        print $0 .' using File::Rename version '.
-	            $File::Rename::VERSION ."\n\n";
-        exit 0;
-    }
-
+    mod_version() if $options->{show_version};
     pod2usage( -verbose => 2 ) if $options->{show_manual};
     pod2usage( -exitval => 1 ) if $options->{show_help};
 
@@ -58,6 +53,13 @@ sub main {
 
     File::Rename::rename(\@ARGV, $options);
 }
+
+sub mod_version {
+    print __FILE__ .
+	' using File::Rename version '.
+        $File::Rename::VERSION ."\n\n";
+    exit 0
+}   
 
 1;
 
@@ -74,7 +76,7 @@ S<[ B<-h>|B<-m>|B<-V> ]>
 S<[ B<-v> ]>
 S<[ B<-n> ]>
 S<[ B<-f> ]>
-S<[ B<-e> I<perlexpr>]*|I<perlexpr>>
+S<[ B<-e>|B<-E> I<perlexpr>]*|I<perlexpr>>
 S<[ I<files> ]>
 
 =head1 DESCRIPTION
@@ -133,6 +135,10 @@ Expression: code to act on files name.
 
 May be repeated to build up code (like C<perl -e>).
 If no B<-e>, the first argument is used as code.
+
+=item B<-E>
+
+Statement: code to act on files name, as B<-e> but terminated by ';'.
 
 =back
 

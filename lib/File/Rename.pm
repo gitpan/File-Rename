@@ -13,6 +13,7 @@ eval{ Getopt::Long::Configure qw(
 ); 1 } or warn $@;
 
 sub GetOptions {
+    my @expression;
     Getopt::Long::GetOptions(
 	'-v|verbose'	=> \my $verbose,
 	'-n|nono'	=> \my $nono,
@@ -20,7 +21,13 @@ sub GetOptions {
 	'-h|?|help'	=> \my $help,
 	'-m|man'	=> \my $man,
 	'-V|version'	=> \my $version,
-	'-e=s'		=> \my @expression
+	'-e=s'		=> \@expression,
+	'-E=s'		=>
+	    sub {
+		my(undef, $e) = @_;
+		$e .= ';'; 
+		push @expression, $e; 
+	    },
     ) or return;
 
     my $options = {
@@ -49,7 +56,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 
 @EXPORT_OK = qw( rename );
-$VERSION = '0.10';
+$VERSION = '0.20';
 
 sub rename_files {
     my $code = shift;

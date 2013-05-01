@@ -41,7 +41,7 @@
    "provides" : {
       "File::Rename" : {
          "file" : "lib/File/Rename.pm",
-         "version" : "0.10"
+         "version" : "0.20"
       },
       "File::Rename::Options" : {
          "file" : "lib/File/Rename.pm",
@@ -54,5 +54,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10"
+   "version" : "0.20"
 }
